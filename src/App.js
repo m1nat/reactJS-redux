@@ -1,53 +1,53 @@
 import React, { useRef, useState } from 'react';
 import PostList from './components/Post-list';
-import MyButton from './components/UI/button/MyButton';
-import PostItem from './components/PostItem';
+import PostForm from './components/PostForm';
+import MySelect from './components/UI/select/MySelect';
+
 
 import './components/styles/app.scss';
-import MyInput from './components/UI/input/MyInput';
 
 function App() {
 
-  // const inputValueRef = useRef()
   const [posts, setPosts] = useState([
     { id: 1, title: 'JavaScript', body: 'Description' },
     { id: 2, title: 'Java', body: 'Description' },
     { id: 3, title: 'Phyton', body: 'Description' }
-  ])
+  ]);
+  const [seletctedSort, setSelectedSort] = useState('');
 
-  const [post, setPost] = useState({ title: '', body: '' })
+  const sortPost = sort => {
+    setSelectedSort(sort);
+    setPosts([...posts].sort( (a, b) => a[sort].localeCompare(b[sort])))
+   }
 
-  const addNewPost = (e) => {
-    e.preventDefault();
-    setPosts([...posts, {...post, id: Date.now()}])
-    setPost({ title: '', body: '' })
+
+  const addNewPost = newPost => {
+    setPosts([...posts, newPost])
+  };
+
+  const removePost = post => {
+    setPosts(posts.filter(p => p.id !== post.id))
   }
-
 
   return (
     <div className="App">
-      <form>
-        <MyInput
-          value={post.title}
-          type='text'
-          placeholder='name of post'
-          onChange={e => setPost({...post, title: e.target.value})}
-        />
-
-        <MyInput
-          value={post.body}
-          type='text'
-          placeholder='descripion of post'
-          onChange={e => setPost({...post, body: e.target.value})}
-        />
-        {/* <MyInput
-          type='text'
-          placeholder='descripion of post'
-          ref = {inputValueRef}
-        /> */}
-        <MyButton onClick={addNewPost}>Create post</MyButton>
-      </form>
-      <PostList posts={posts} title='Список постов 1' />
+      <PostForm createPost={addNewPost} />
+      <MySelect
+        onChange={sortPost}
+        defaultValue="Sort of..."
+        option={[
+          {value: 'title', name: 'name'},
+          {value: 'body', name: 'description'}
+        ]}
+      />
+      {posts.length !== 0 ?
+        <PostList removePost={removePost} posts={posts} title='Список постов 1' /> :
+        <div>
+          <h1>
+            Posts is not defined
+          </h1>
+        </div>
+      }
     </div>
   );
 }
